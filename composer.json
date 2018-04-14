@@ -1,0 +1,21 @@
+{
+  "name": "zacksleo/laravel-yii",
+  "description": "laravel gridview & active form from yii2",
+  "type": "laravel",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "zacksleo",
+      "email": "zacksleo@gmail.com"
+    }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "illuminate/support": "5.5.*"
+  },
+  "autoload": {
+    "psr-4": {
+      "zacksleo\\laravel\\yii\\": "src"
+    }
+  }
+}
