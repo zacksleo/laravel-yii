@@ -198,10 +198,10 @@ class ActionColumn extends Column
         if (is_callable($this->urlCreator)) {
             return call_user_func($this->urlCreator, $action, $model, $key, $index, $this);
         } else {
-            $params = is_array($key) ? $key : ['id' => (string) $key];
+            $params = is_array($key) ? $key : ['id' => (string)$key];
             $url = $this->controller ? $this->controller . '/' . $action : $action;
 
-            return url($url,$params);
+            return url($url, $params);
         }
     }
 
