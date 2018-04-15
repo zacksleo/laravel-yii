@@ -96,8 +96,8 @@ use zacksleo\laravel\yii\helpers\Html;
 <?= $form->field($model, 'img')->textInput() ?>
 
 <div class="form-group">
-    <?= Html::submitButton('保存',
-        ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+    <?= Html::submitButton('Save',
+        ['class' => $model->model->exists() ? 'btn btn-success' : 'btn btn-primary']) ?>
 </div>
 
 <?php ActiveForm::end(); ?>
