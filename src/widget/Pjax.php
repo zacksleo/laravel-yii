@@ -7,11 +7,11 @@
 
 namespace zacksleo\laravel\yii\widgets;
 
-use Yii;
-use yii\base\Widget;
-use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
-use yii\helpers\Json;
+use zacksleo\laravel\yii\Yii;
+use zacksleo\laravel\yii\base\Widget;
+use zacksleo\laravel\yii\helpers\ArrayHelper;
+use zacksleo\laravel\yii\helpers\Html;
+use zacksleo\laravel\yii\helpers\Json;
 use yii\web\Response;
 
 /**
