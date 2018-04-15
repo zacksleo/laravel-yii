@@ -8,11 +8,13 @@
 namespace zacksleo\laravel\yii\helpers;
 
 use function array_shift;
-use Yii;
+use function get_class;
+use function var_dump;
+use zacksleo\laravel\yii\Yii;
 use InvalidArgumentException as InvalidParamException;
-use yii\db\ActiveRecordInterface;
+use Illuminate\Database\Eloquent\Model as ActiveRecordInterface;
 use yii\validators\StringValidator;
-use yii\web\Request;
+use Illuminate\Http\Request as Request;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -327,11 +329,11 @@ class Html
      */
     public static function beginForm($action = '', $method = 'post', $options = [])
     {
-        $action = Url::to($action);
+        $action = url($action);
 
         $hiddenInputs = [];
 
-        $request = Yii::$app->getRequest();
+        $request = request();
         if ($request instanceof Request) {
             if (strcasecmp($method, 'get') && strcasecmp($method, 'post')) {
                 // simulate PUT, DELETE, etc. via POST
@@ -340,8 +342,8 @@ class Html
             }
             $csrf = ArrayHelper::remove($options, 'csrf', true);
 
-            if ($csrf && $request->enableCsrfValidation && strcasecmp($method, 'post') === 0) {
-                $hiddenInputs[] = static::hiddenInput($request->csrfParam, $request->getCsrfToken());
+            if ($csrf && strcasecmp($method, 'post') === 0) {
+                $hiddenInputs[] = csrf_field();
             }
         }
 
@@ -1182,12 +1184,13 @@ class Html
     public static function activeHint($model, $attribute, $options = [])
     {
         $attribute = static::getAttributeName($attribute);
-        $hint = isset($options['hint']) ? $options['hint'] : $model->getAttributeHint($attribute);
+        $hint = isset($options['hint']) ? $options['hint'] : method_exists($model,
+            'attributeHints') ? $model->getAttributeHint($attribute) : '';
         if (empty($hint)) {
             return '';
         }
         $tag = ArrayHelper::remove($options, 'tag', 'div');
-        unset($options['hint']);
+
         return static::tag($tag, $hint, $options);
     }
 
@@ -1269,7 +1272,7 @@ class Html
     public static function error($model, $attribute, $options = [])
     {
         $attribute = static::getAttributeName($attribute);
-        $error = $model->getFirstError($attribute);
+        $error = isset($errors) ? $errors->get($attribute) : '';
         $tag = ArrayHelper::remove($options, 'tag', 'div');
         $encode = ArrayHelper::remove($options, 'encode', true);
         return Html::tag($tag, $encode ? Html::encode($error) : $error, $options);
@@ -2117,7 +2120,7 @@ class Html
             throw new InvalidParamException('Attribute name must contain word characters only.');
         }
         $attribute = $matches[2];
-        $value = $model->$attribute;
+        $value = $model->model->$attribute;
         if ($matches[3] !== '') {
             foreach (explode('][', trim($matches[3], '[]')) as $id) {
                 if ((is_array($value) || $value instanceof \ArrayAccess) && isset($value[$id])) {
@@ -2132,12 +2135,12 @@ class Html
         if (is_array($value)) {
             foreach ($value as $i => $v) {
                 if ($v instanceof ActiveRecordInterface) {
-                    $v = $v->getPrimaryKey(false);
+                    $v = $v->getKey();
                     $value[$i] = is_array($v) ? json_encode($v) : $v;
                 }
             }
         } elseif ($value instanceof ActiveRecordInterface) {
-            $value = $value->getPrimaryKey(false);
+            $value = $value->getKey();
 
             return is_array($value) ? json_encode($value) : $value;
         }
@@ -2155,14 +2158,15 @@ class Html
      *
      * See [[getAttributeName()]] for explanation of attribute expression.
      *
-     * @param Model $model the model object
+     * @param \Illuminate\Foundation\Http\FormRequest $model the model object
      * @param string $attribute the attribute name or expression
      * @return string the generated input name
      * @throws InvalidParamException if the attribute name contains non-word characters.
      */
     public static function getInputName($model, $attribute)
     {
-        $formName = $model->formName();
+        $reflect = new \ReflectionClass($model);
+        $formName = ucfirst($reflect->getShortName());
         if (!preg_match(static::$attributeRegex, $attribute, $matches)) {
             throw new InvalidParamException('Attribute name must contain word characters only.');
         }

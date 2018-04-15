@@ -7,7 +7,7 @@
 
 namespace zacksleo\laravel\yii\widgets;
 
-use yii\web\AssetBundle;
+use zacksleo\laravel\yii\web\AssetBundle;
 
 /**
  * @author Qiang Xue <qiang.xue@gmail.com>

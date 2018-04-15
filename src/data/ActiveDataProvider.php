@@ -134,25 +134,12 @@ class ActiveDataProvider extends BaseDataProvider
                     $keys[] = call_user_func($this->key, $model);
                 }
             }
-
             return $keys;
         } elseif ($this->query instanceof ActiveQueryInterface) {
-            $pks = $this->query->getModel()->getKeyName();
-            if (count($pks) === 1) {
-                $pk = $pks[0];
-                foreach ($models as $model) {
-                    $keys[] = $model[$pk];
-                }
-            } else {
-                foreach ($models as $model) {
-                    $kk = [];
-                    foreach ($pks as $pk) {
-                        $kk[$pk] = $model[$pk];
-                    }
-                    $keys[] = $kk;
-                }
+            $pk = $this->query->getModel()->getKeyName();
+            foreach ($models as $model) {
+                $keys[] = $model[$pk];
             }
-
             return $keys;
         } else {
             return array_keys($models);

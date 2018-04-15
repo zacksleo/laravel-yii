@@ -7,6 +7,10 @@
 
 namespace zacksleo\laravel\yii\widgets;
 
+use function array_keys;
+use Illuminate\Support\Facades\Session;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use function var_dump;
 use zacksleo\laravel\yii\Yii as Yii;
 use zacksleo\laravel\yii\base\Component;
 use zacksleo\laravel\yii\helpers\ArrayHelper;
@@ -28,7 +32,7 @@ class ActiveField extends Component
      */
     public $form;
     /**
-     * @var Model the data model that this field is associated with.
+     * @var \Illuminate\Foundation\Http\FormRequest the data model that this field is associated with.
      */
     public $model;
     /**
@@ -211,6 +215,7 @@ class ActiveField extends Component
                 $this->hint(null);
             }
             $content = strtr($this->template, $this->parts);
+
         } elseif (!is_string($content)) {
             $content = call_user_func($content, $this);
         }
@@ -236,15 +241,15 @@ class ActiveField extends Component
         $options = $this->options;
         $class = isset($options['class']) ? [$options['class']] : [];
         $class[] = "field-$inputID";
-        if ($this->model->isAttributeRequired($attribute)) {
+        $rules = $this->model->rules();
+        if (strpos($rules[$attribute], 'required') > -1) {
             $class[] = $this->form->requiredCssClass;
         }
-        if ($this->model->hasErrors($attribute)) {
+        if (isset($errors) && $errors->has($attribute)) {
             $class[] = $this->form->errorCssClass;
         }
         $options['class'] = implode(' ', $class);
         $tag = ArrayHelper::remove($options, 'tag', 'div');
-
         return Html::beginTag($tag, $options);
     }
 
@@ -312,7 +317,6 @@ class ActiveField extends Component
         }
         $options = array_merge($this->errorOptions, $options);
         $this->parts['{error}'] = Html::error($this->model, $this->attribute, $options);
-
         return $this;
     }
 
@@ -343,6 +347,7 @@ class ActiveField extends Component
         if ($content !== null) {
             $options['hint'] = $content;
         }
+
         $this->parts['{hint}'] = Html::activeHint($this->model, $this->attribute, $options);
 
         return $this;
@@ -391,7 +396,6 @@ class ActiveField extends Component
         $this->addAriaAttributes($options);
         $this->adjustLabelFor($options);
         $this->parts['{input}'] = Html::activeTextInput($this->model, $this->attribute, $options);
-
         return $this;
     }
 
@@ -747,17 +751,16 @@ class ActiveField extends Component
     protected function getClientOptions()
     {
         $attribute = Html::getAttributeName($this->attribute);
-        if (!in_array($attribute, $this->model->activeAttributes(), true)) {
+        if (!in_array($attribute, array_keys($this->model->rules()), true)) {
             return [];
         }
 
         $clientValidation = $this->isClientValidationEnabled();
         $ajaxValidation = $this->isAjaxValidationEnabled();
-
         if ($clientValidation) {
             $validators = [];
+            /*
             foreach ($this->model->getActiveValidators($attribute) as $validator) {
-                /* @var $validator \yii\validators\Validator */
                 $js = $validator->clientValidateAttribute($this->model, $attribute, $this->form->getView());
                 if ($validator->enableClientValidation && $js != '') {
                     if ($validator->whenClient !== null) {
@@ -766,6 +769,7 @@ class ActiveField extends Component
                     $validators[] = $js;
                 }
             }
+            */
         }
 
         if (!$ajaxValidation && (!$clientValidation || empty($validators))) {
@@ -783,7 +787,8 @@ class ActiveField extends Component
         if (isset($this->selectors['error'])) {
             $options['error'] = $this->selectors['error'];
         } elseif (isset($this->errorOptions['class'])) {
-            $options['error'] = '.' . implode('.', preg_split('/\s+/', $this->errorOptions['class'], -1, PREG_SPLIT_NO_EMPTY));
+            $options['error'] = '.' . implode('.',
+                    preg_split('/\s+/', $this->errorOptions['class'], -1, PREG_SPLIT_NO_EMPTY));
         } else {
             $options['error'] = isset($this->errorOptions['tag']) ? $this->errorOptions['tag'] : 'span';
         }
@@ -797,7 +802,8 @@ class ActiveField extends Component
         }
 
         if (!empty($validators)) {
-            $options['validate'] = new JsExpression("function (attribute, value, messages, deferred, \$form) {" . implode('', $validators) . '}');
+            $options['validate'] = new JsExpression("function (attribute, value, messages, deferred, \$form) {" . implode('',
+                    $validators) . '}');
         }
 
         if ($this->addAriaAttributes === false) {
@@ -854,11 +860,18 @@ class ActiveField extends Component
     protected function addAriaAttributes(&$options)
     {
         if ($this->addAriaAttributes) {
-            if (!isset($options['aria-required']) && $this->model->isAttributeRequired($this->attribute)) {
-                $options['aria-required'] =  'true';
+
+            if (!isset($options['aria-required'])) {
+                $rules = $this->model->rules();
+                if (!isset($rules[$this->attribute])) {
+                    throw new InvalidConfigurationException('no ' . $this->attribute . ' config in rules() function.');
+                }
+                if (strpos($rules[$this->attribute], 'required') > -1) {
+                    $options['aria-required'] = 'true';
+                }
             }
             if (!isset($options['aria-invalid'])) {
-                if ($this->model->hasErrors($this->attribute)) {
+                if (isset($errors) && $errors->has($this->attribute)) {
                     $options['aria-invalid'] = 'true';
                 }
             }

@@ -7,6 +7,7 @@
 
 namespace zacksleo\laravel\yii\grid;
 
+use function var_dump;
 use zacksleo\laravel\yii\i18n\Formatter;
 use zacksleo\laravel\yii\Yii as Yii;
 use Closure;
@@ -471,7 +472,6 @@ class GridView extends BaseListView
                     $rows[] = $row;
                 }
             }
-
             $rows[] = $this->renderTableRow($model, $key, $index);
 
             if ($this->afterRow !== null) {

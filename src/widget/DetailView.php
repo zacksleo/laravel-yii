@@ -7,15 +7,14 @@
 
 namespace zacksleo\laravel\yii\widgets;
 
-use zacksleo\laravel\Yii;
-use yii\base\Arrayable;
-use yii\i18n\Formatter;
-use yii\base\InvalidConfigException;
+use zacksleo\laravel\yii\Yii;
+use zacksleo\laravel\yii\base\Arrayable;
+use zacksleo\laravel\yii\i18n\Formatter;
+use InvalidArgumentException as InvalidConfigException;
 use Illuminate\Database\Eloquent\Model;
-use yii\base\Widget;
+use zacksleo\laravel\yii\base\Widget;
 use zacksleo\laravel\yii\helpers\ArrayHelper;
 use zacksleo\laravel\yii\helpers\Html;
-use yii\helpers\Inflector;
 
 /**
  * DetailView displays the detail of a single data [[model]].
@@ -131,7 +130,7 @@ class DetailView extends Widget
             throw new InvalidConfigException('Please specify the "model" property.');
         }
         if ($this->formatter === null) {
-            $this->formatter = Yii::$app->getFormatter();
+            $this->formatter = new Formatter();
         } elseif (is_array($this->formatter)) {
             $this->formatter = Yii::createObject($this->formatter);
         }

@@ -7,13 +7,14 @@
 
 namespace zacksleo\laravel\yii\widgets;
 
-use zacksleo\laravel\Yii;
+use zacksleo\laravel\yii\Yii;
 use InvalidArgumentException as InvalidCallException;
 use zacksleo\laravel\yii\base\Widget;
 use Illuminate\Database\Eloquent\Model;
 use zacksleo\laravel\yii\helpers\ArrayHelper;
 use zacksleo\laravel\yii\helpers\Html;
 use zacksleo\laravel\yii\helpers\Json;
+use zacksleo\laravel\yii\widgets\ActiveFormAsset;
 
 /**
  * ActiveForm is a widget that builds an interactive HTML form for one or multiple data models.
@@ -55,7 +56,7 @@ class ActiveForm extends Widget
      * @var string the default field class name when calling [[field()]] to create a new field.
      * @see fieldConfig
      */
-    public $fieldClass = 'yii\widgets\ActiveField';
+    public $fieldClass = 'zacksleo\laravel\yii\widgets\ActiveField';
     /**
      * @var array|\Closure the default configuration used by [[field()]] when creating a new field object.
      * This can be either a configuration array or an anonymous function returning a configuration array.
@@ -222,7 +223,7 @@ class ActiveForm extends Widget
         $attributes = Json::htmlEncode($this->attributes);
         $view = $this->getView();
         ActiveFormAsset::register($view);
-        $view->registerJs("jQuery('#$id').yiiActiveForm($attributes, $options);");
+        //$view->registerJs("jQuery('#$id').yiiActiveForm($attributes, $options);");
     }
 
     /**

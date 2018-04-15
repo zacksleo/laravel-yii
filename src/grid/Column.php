@@ -8,6 +8,7 @@
 namespace zacksleo\laravel\yii\grid;
 
 use Closure;
+use function var_dump;
 use zacksleo\laravel\yii\base\BaseObject as Object;
 use zacksleo\laravel\yii\helpers\Html;
 use zacksleo\laravel\yii\base\BaseObject;

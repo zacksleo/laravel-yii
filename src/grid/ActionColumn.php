@@ -7,6 +7,9 @@
 
 namespace zacksleo\laravel\yii\grid;
 
+use function array_keys;
+use function http_build_query;
+use function var_dump;
 use zacksleo\laravel\Yii;
 use zacksleo\laravel\yii\helpers\Html;
 
@@ -198,10 +201,20 @@ class ActionColumn extends Column
         if (is_callable($this->urlCreator)) {
             return call_user_func($this->urlCreator, $action, $model, $key, $index, $this);
         } else {
+            $resource = [
+                'view' => 'show',
+                'create' => 'create',
+                'update' => 'edit',
+                'delete' => 'destroy'
+            ];
+            if (in_array($action, array_keys($resource))) {
+                $action = $resource[$action];
+            }
             $params = is_array($key) ? $key : ['id' => (string)$key];
-            $url = $this->controller ? $this->controller . '/' . $action : $action;
-
-            return url($url, $params);
+            $path = url()->current();
+            $paths = explode('/', $path);
+            $url = end($paths) . '.' . $action;
+            return route($url,$params);
         }
     }
 
