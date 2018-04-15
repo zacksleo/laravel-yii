@@ -1,6 +1,12 @@
 # laravel-yii
-use Yii2 Gridview &amp; ActiveForm in laravel
+use Yii2 Gridview, ActiveForm, DetailView etc... in laravel
 
+## Features
+
++ GridView
++ ActiveForm
++ DetailView
++ Html
 
 ## Get Started
 
@@ -103,3 +109,17 @@ use zacksleo\laravel\yii\helpers\Html;
 <?php ActiveForm::end(); ?>
 
 ```
+
+## DetailView
+
+```
+echo zacksleo\laravel\yii\widgets\DetailView::widget([
+       'model' => $model,
+       'attributes' => [
+           'id',
+           'name',
+           'image',
+         ]
+     ]);
+```
+
