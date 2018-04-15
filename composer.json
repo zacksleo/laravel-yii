@@ -17,5 +17,12 @@
     "psr-4": {
       "zacksleo\\laravel\\yii\\": "src"
     }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "zacksleo\\laravel\\yii\\ServiceProvider"
+      ]
+    }
   }
 }
