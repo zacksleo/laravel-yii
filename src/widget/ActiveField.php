@@ -215,7 +215,6 @@ class ActiveField extends Component
                 $this->hint(null);
             }
             $content = strtr($this->template, $this->parts);
-
         } elseif (!is_string($content)) {
             $content = call_user_func($content, $this);
         }
@@ -860,7 +859,6 @@ class ActiveField extends Component
     protected function addAriaAttributes(&$options)
     {
         if ($this->addAriaAttributes) {
-
             if (!isset($options['aria-required'])) {
                 $rules = $this->model->rules();
                 if (!isset($rules[$this->attribute])) {

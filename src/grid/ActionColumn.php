@@ -214,7 +214,7 @@ class ActionColumn extends Column
             $path = url()->current();
             $paths = explode('/', $path);
             $url = end($paths) . '.' . $action;
-            return route($url,$params);
+            return route($url, $params);
         }
     }
 
