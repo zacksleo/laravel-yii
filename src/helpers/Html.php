@@ -2120,7 +2120,7 @@ class Html
             throw new InvalidParamException('Attribute name must contain word characters only.');
         }
         $attribute = $matches[2];
-        $value = $model->model->$attribute;
+        $value = $model->getModel()->$attribute;
         if ($matches[3] !== '') {
             foreach (explode('][', trim($matches[3], '[]')) as $id) {
                 if ((is_array($value) || $value instanceof \ArrayAccess) && isset($value[$id])) {
